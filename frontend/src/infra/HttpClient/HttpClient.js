@@ -1,3 +1,5 @@
+import { tokenService } from "../../services/auth/tokenService";
+
 export async function HttpClient(fetchUrl, fetchOptions) {
   const options = {
     ...fetchOptions,
@@ -15,5 +17,28 @@ export async function HttpClient(fetchUrl, fetchOptions) {
         statusText: serverResponse.statusText,
         body: await serverResponse.json(),
       }
+    })
+    .then(async (response) => {
+      if (!fetchOptions.refresh) return response;
+      if (response.status !== 401) return response;
+
+      console.log('Middleware: Rodar código para atualizar o token');
+      const refreshResponse = await HttpClient('http://localhost:3000/api/refresh', {
+        method: 'GET'
+      });
+      const newAcessToken = refreshResponse.body.data.acess_token;
+      const newRefreshToken = refreshResponse.body.data.refresh_token;
+
+      tokenService.save(newAcessToken);
+
+      const retryResponse = await HttpClient(fetchUrl, {
+        ...options,
+        refresh: false,
+        headers: {
+          'Authorization': `Bearer ${newAcessToken}`
+        }
+      })
+
+      return retryResponse;
     });
 }

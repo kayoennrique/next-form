@@ -24,10 +24,10 @@ export const authService = {
             refresh_token
           }
         })
-  
+
         console.log(response);
       })
-    },
+  },
   async getSession(ctx = null) {
     const token = tokenService.get(ctx);
 
@@ -35,7 +35,8 @@ export const authService = {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${token}`
-      }
+      },
+      refresh: true,
     })
       .then((response) => {
         if (!response.ok) throw new Error('Não autorizado');
