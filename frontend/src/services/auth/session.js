@@ -8,9 +8,7 @@ export function withSession(role) {
         ...ctx,
         req: {
           ...ctx.req,
-          session: {
-            name: 'Nome do usuário'
-          }
+          session,
         }
       };
       return role(modifiedCtx);
