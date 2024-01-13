@@ -6,7 +6,7 @@ export default function HomeScreen() {
   const router = useRouter();
   const [values, setValues] = React.useState({
     usuario: 'kayoennrique',
-    senha: 'safepassword'
+    senha: 'safepassword',
   });
 
   function handleChange(event) {
@@ -16,13 +16,15 @@ export default function HomeScreen() {
       return {
         ...currentValues,
         [fieldName]: fieldValue,
-      }
+      };
     })
   }
+
   return (
     <div>
       <h1>Login</h1>
       <form onSubmit={(event) => {
+        
         event.preventDefault();
         authService
           .login({
@@ -33,8 +35,9 @@ export default function HomeScreen() {
             // router.push('/auth-page-static');
             router.push('/auth-page-ssr');
           })
-          .catch(() => {
-            alert('Usuário ou a senha estão invalidos')
+          .catch((err) => {
+            console.log(err);
+            alert('Usuário ou a senha estão inválidos')
           })
       }}>
         <input
@@ -45,11 +48,18 @@ export default function HomeScreen() {
           placeholder="Senha" name="senha" type="password"
           value={values.senha} onChange={handleChange}
         />
+        {/* <pre>
+          {JSON.stringify(values, null, 2)}
+        </pre> */}
         <div>
           <button>
             Entrar
           </button>
         </div>
+        <p>
+          <a href="/auth-page-ssr">auth-page-ssr</a>
+          <a href="/auth-page-static">auth-page-static</a>
+        </p>
       </form>
     </div>
   );

@@ -7,26 +7,26 @@ export const authService = {
       method: 'POST',
       body: { username, password }
     })
-      .then(async (serverResponse) => {
-        if (!serverResponse.ok) throw new Error('Usuário ou senha inválidos!')
-        const body = serverResponse.body;
+    .then(async (serverResponse) => {
+      if(!serverResponse.ok) throw new Error('Usuário ou senha inválidos!')
+      const body = serverResponse.body;
 
-        tokenService.save(body.data.access_token);
+      tokenService.save(body.data.access_token);
 
-        return body;
+      return body;
+    })
+    .then(async ({ data }) => {
+      const { refresh_token }   = data;
+
+      const response = await HttpClient('/api/refresh', {
+        method: 'POST',
+        body: {
+          refresh_token
+        }
       })
-      .then(async ({ data }) => {
-        const { refresh_token } = data
 
-        const response = await HttpClient('/api/refresh', {
-          method: 'POST',
-          body: {
-            refresh_token
-          }
-        })
-
-        console.log(response);
-      })
+      console.log(response);
+    })
   },
   async getSession(ctx = null) {
     const token = tokenService.get(ctx);
@@ -36,12 +36,13 @@ export const authService = {
       headers: {
         'Authorization': `Bearer ${token}`
       },
+      ctx,
       refresh: true,
     })
-      .then((response) => {
-        if (!response.ok) throw new Error('Não autorizado');
+    .then((response) => {
+      if(!response.ok) throw new Error('Não autorizado');
 
-        return response.body.data;
-      });
+      return response.body.data;
+    });
   }
 };
